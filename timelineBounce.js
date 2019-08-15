@@ -4,11 +4,11 @@ const port = 8082;
 const uuidv4 = require('uuid/v4');
 var app = express();
 var verbose = true;
-var version = 0.9;
+var version = 1.0;
 
 var timelineToken = "adrCWt4C5tOA-qGFkU7aVkEobvTxGElVGrBFXrcz0ck";
 
-var authorizedKeys = ["monzo-87af5abcf0de4937"]
+var authorizedKeys = ["monzo-87af5abcf0de4937", "juliet-ce20ef18-845e"]
 
 app.use(function(req, res, next) {
   req.rawBody = '';
