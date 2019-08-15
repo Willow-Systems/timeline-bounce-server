@@ -4,7 +4,7 @@ const port = 8082;
 const uuidv4 = require('uuid/v4');
 var app = express();
 var verbose = true;
-var version = 0.8;
+var version = 0.9;
 
 var timelineToken = "adrCWt4C5tOA-qGFkU7aVkEobvTxGElVGrBFXrcz0ck";
 
@@ -149,6 +149,7 @@ function handleMonzoTransactionCreated(obj) {
   log("Handling Monzo Transaction", true);
   log("Obj: " + JSON.stringify(obj), true);
   // var pbody = obj.data.merchant.address.address + ", " + obj.data.merchant.address.city;
+  var pbody = "";
   var ptitle = "Spent " + currencyToSymbol(obj.data.currency) + moneyFormat(obj.data.amount.toString().replace("-",""));
   createTimelinePin(generateNewPinID(), timelineToken, obj.data.created.toString(), ptitle, pbody, "HOCKEY_GAME");
   log("Created pin", true)
