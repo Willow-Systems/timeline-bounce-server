@@ -4,7 +4,7 @@ const uuidv4 = require('uuid/v4');
 const port = 8082;
 var app = express();
 var verbose = true;
-var version = 1.1;
+var version = 1.2;
 
 var SETTING_timelineToken = "adrCWt4C5tOA-qGFkU7aVkEobvTxGElVGrBFXrcz0ck";
 var SETTING_authorizedKeys = ["monzo-87af5abcf0de4937", "juliet-ce20ef18-845e"]
@@ -97,7 +97,7 @@ function handleMonzoTransactionCreated(obj) {
 }
 function handleSimplePinCreation(obj) {
   var pinDate = new Date().toISOString().split('.')[0]+"Z";
-  createTimelinePin(generateNewPinID(), SETTING_timelineToken, pinDate, obj.title, obj.body);
+  createTimelinePin(generateNewPinID(), SETTING_timelineToken, pinDate, obj.data.title, obj.data.body);
 }
 function createTimelinePin(id, token, time, title, body, flag = "NOTIFICATION_FLAG") {
   //Timeformat = "2015-09-22T16:30:00Z"
