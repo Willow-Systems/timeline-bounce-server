@@ -252,13 +252,13 @@ POST BODY:
 
 
 
-There are currently two types of request `simple`, which does minimal parsing, just creates a token, and `transaction.created`, which is for a new Monzo card transaction
+There are currently two types of request: `simple`, which does minimal parsing, just creates a token, and `transaction.created`, which is for a new Monzo card transaction
 
 
 
 For the simple token creation, the JSON is:
 
-> {
+  {
 
     "type": "simple",
 
