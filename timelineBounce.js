@@ -1,14 +1,16 @@
 const express = require('express');
 const request = require('request');
-const port = 8082;
 const uuidv4 = require('uuid/v4');
+const port = 8082;
 var app = express();
 var verbose = true;
-var version = 1.0;
+var version = 1.1;
 
-var timelineToken = "adrCWt4C5tOA-qGFkU7aVkEobvTxGElVGrBFXrcz0ck";
+var SETTING_timelineToken = "adrCWt4C5tOA-qGFkU7aVkEobvTxGElVGrBFXrcz0ck";
+var SETTING_authorizedKeys = ["monzo-87af5abcf0de4937", "juliet-ce20ef18-845e"]
+var SETTING_reducedInfoMode = true;
 
-var authorizedKeys = ["monzo-87af5abcf0de4937", "juliet-ce20ef18-845e"]
+var STRING_spent = "spent"
 
 app.use(function(req, res, next) {
   req.rawBody = '';
@@ -45,6 +47,12 @@ function currencyToSymbol(currency) {
     case "EUR":
       return "€";
     break;
+    case "JPY":
+      return "¥";
+    case "RUB":
+      return "₽";
+    case "BTC":
+      return "₿";
     default:
       return "§";
   }
@@ -66,99 +74,31 @@ function moneyFormat(money) {
     return money.substring(0, len - 2) + "." + money.substring(len - 2);
   }
 }
-
-app.post('/incoming/',function(req,res){
-  log("Return 401 - Missing Key");
-  res.status(401);
-  res.end("Missing Auth Key");
-});
-app.post('/incoming/:key',function(req,res){
-  var authorized = false;
-  for (var i = 0; i < authorizedKeys.length; i++) {
-    if (authorizedKeys[i] == req.params.key) {
-      authorized = true;
-    }
-  }
-
-  if (authorized) {
-    var body=req.rawBody;
-    body = JSON.parse(body);
-
-    log("incoming - " + body.type);
-    log("user - " + req.params.key.split("-")[0].toString());
-    //Reply straight away
-    res.end("200");
-
-    switch (body.type) {
-      case "transaction.created":
-        //Monzo transaction created
-        handleMonzoTransactionCreated(body);
-        break;
-      case "simple":
-        handleSimplePinCreation(body);
-      break;
-      default:
-        log("Unknown handle type '" + body.type + "'");
-    }
-  } else {
-    log("Return 403 - Invalid Key");
-    res.status(403);
-    res.end("Invalid Auth Key");
-  }
-});
-
-app.get('/updateToken/',function(req,res){
-  log("updateToken");
-  res.status(401);
-  res.end("Missing Auth Key");
-});
-app.get('/updateToken/:key/',function(req,res){
-  log("updateToken");
-  res.status(400);
-  res.end("Missing token");
-});
-app.get('/updateToken/:key/:token',function(req,res){
-  log("updateToken");
-  var authorized = false;
-  for (var i = 0; i < authorizedKeys.length; i++) {
-    if (authorizedKeys[i] == req.params.key) {
-      authorized = true;
-    }
-  }
-  if (authorized) {
-    timelineToken = req.params.token;
-    res.end("Updated token to " + req.params.token);
-  } else {
-    log("Return 403 - Invalid Key");
-    res.status(403);
-    res.end("Invalid Auth Key");
-  }
-
-});
-
-app.get('/ping',function(req,res){
-  log("ping - pong");
-  res.end("pong");
-});
-
 function generateNewPinID() {
   return "willow-systems-" + uuidv4().split("-")[0];
 }
-
 function handleMonzoTransactionCreated(obj) {
-  log("Handling Monzo Transaction", true);
+  log("transaction::monzo::amount:" + obj.data.amount.toString());
   log("Obj: " + JSON.stringify(obj), true);
-  // var pbody = obj.data.merchant.address.address + ", " + obj.data.merchant.address.city;
-  var pbody = "";
-  var ptitle = "Spent " + currencyToSymbol(obj.data.currency) + moneyFormat(obj.data.amount.toString().replace("-",""));
-  createTimelinePin(generateNewPinID(), timelineToken, obj.data.created.toString(), ptitle, pbody, "HOCKEY_GAME");
+
+  var data = obj.data;
+
+  var pbody = obj.data.merchant.address.address + ", " + obj.data.merchant.address.city;
+  var ptitle = STRING_spent + " " + currencyToSymbol(obj.data.currency) + moneyFormat(obj.data.amount.toString().replace("-",""));
+
+  if (SETTING_reducedInfoMode) {
+    //We don't want to put much information in the pin
+    pbody = ""
+  }
+
+  //Hockey puck? No no, that's a coin now...
+  createTimelinePin(generateNewPinID(), SETTING_timelineToken, obj.data.created.toString(), ptitle, pbody, "HOCKEY_GAME");
   log("Created pin", true)
 }
 function handleSimplePinCreation(obj) {
   var pinDate = new Date().toISOString().split('.')[0]+"Z";
-  createTimelinePin(generateNewPinID(), timelineToken, pinDate, obj.title, obj.body);
+  createTimelinePin(generateNewPinID(), SETTING_timelineToken, pinDate, obj.title, obj.body);
 }
-
 function createTimelinePin(id, token, time, title, body, flag = "NOTIFICATION_FLAG") {
   //Timeformat = "2015-09-22T16:30:00Z"
   var pin = {};
@@ -208,6 +148,80 @@ function createTimelinePin(id, token, time, title, body, flag = "NOTIFICATION_FL
     }
   })
 }
+
+
+//Web app side
+app.post('/incoming/',function(req,res){
+  log("Return 401 - Missing Key");
+  res.status(401);
+  res.end("Missing Auth Key");
+});
+app.post('/incoming/:key',function(req,res){
+  var authorized = false;
+  for (var i = 0; i < SETTING_authorizedKeys.length; i++) {
+    if (SETTING_authorizedKeys[i] == req.params.key) {
+      authorized = true;
+    }
+  }
+
+  if (authorized) {
+    var body=req.rawBody;
+    body = JSON.parse(body);
+
+    log("incoming - " + body.type);
+    log("user - " + req.params.key.split("-")[0].toString());
+    //Reply straight away
+    res.end("200");
+
+    switch (body.type) {
+      case "transaction.created":
+        //Monzo transaction created
+        handleMonzoTransactionCreated(body);
+        break;
+      case "simple":
+        handleSimplePinCreation(body);
+      break;
+      default:
+        log("Unknown handle type '" + body.type + "'");
+    }
+  } else {
+    log("Return 403 - Invalid Key");
+    res.status(403);
+    res.end("Invalid Auth Key");
+  }
+});
+app.get('/updateToken/',function(req,res){
+  log("updateToken");
+  res.status(401);
+  res.end("Missing Auth Key");
+});
+app.get('/updateToken/:key/',function(req,res){
+  log("updateToken");
+  res.status(400);
+  res.end("Missing token");
+});
+app.get('/updateToken/:key/:token',function(req,res){
+  log("updateToken");
+  var authorized = false;
+  for (var i = 0; i < SETTING_authorizedKeys.length; i++) {
+    if (SETTING_authorizedKeys[i] == req.params.key) {
+      authorized = true;
+    }
+  }
+  if (authorized) {
+    SETTING_timelineToken = req.params.token;
+    res.end("Updated token to " + req.params.token);
+  } else {
+    log("Return 403 - Invalid Key");
+    res.status(403);
+    res.end("Invalid Auth Key");
+  }
+
+});
+app.get('/ping',function(req,res){
+  log("ping - pong");
+  res.end("pong");
+});
 
 
 app.listen(port,function(){
