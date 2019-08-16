@@ -2,7 +2,7 @@
 
 Version 1.1
 
-#### About
+### About
 
 
 
@@ -14,7 +14,7 @@ Although it can be used to make programmatic timeline pin creation easier, it is
 
 
 
-#### Prerequisites
+### Prerequisites
 
 
 
@@ -52,7 +52,7 @@ If you do not already have nginx setup, you'll need to install it and use a serv
 
 
 
-#### Server Installation
+### Server Installation
 
 
 
@@ -72,7 +72,7 @@ Before you run the server, you will need to configure it with some keys.
 
 
 
-#### Server Configuration
+### Server Configuration
 
 
 
@@ -184,7 +184,7 @@ to
 
 
 
-#### Localisation
+### Localisation
 
 
 
@@ -203,8 +203,7 @@ could be translated into french by updating it to
 > STRING_spent = "dépensé"
 
 
-
-#### Running the server 
+### Running the server 
 
 
 
@@ -276,7 +275,7 @@ GET /updateToken/{key}/{token}  -  Updated the in-memory timeline token to the v
 
 
 
-#### Questions
+### Questions
 
 
 
