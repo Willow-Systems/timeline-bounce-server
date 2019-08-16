@@ -258,7 +258,7 @@ There are currently two types of request: `simple`, which does minimal parsing, 
 
 For the simple token creation, the JSON is:
 
-  {
+    {
 
     "type": "simple",
 
@@ -270,7 +270,7 @@ For the simple token creation, the JSON is:
 
     }
 
-  }
+    }
 
   
 
