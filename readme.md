@@ -116,7 +116,7 @@ The access keys are sent at the end of incoming requests in the URL, this is so 
 
 
 
-<name>-<token>  
+{name}-{token}  
 
 
 
