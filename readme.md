@@ -280,4 +280,4 @@ GET /updateToken/{key}/{token}  -  Updated the in-memory timeline token to the v
 
 
 
-If you have any further questions, find me (will0) on the [rebble discord](https://discordapp.com/invite/aRUAYFN)
+If you have any further questions, find me (@will0) on the [rebble discord](https://discordapp.com/invite/aRUAYFN)
