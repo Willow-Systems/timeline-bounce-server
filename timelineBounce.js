@@ -3,14 +3,25 @@ const request = require('request');
 const uuidv4 = require('uuid/v4');
 const port = 8082;
 var app = express();
-var verbose = true;
 var version = 1.2;
 
-var SETTING_timelineToken = "adrCWt4C5tOA-qGFkU7aVkEobvTxGElVGrBFXrcz0ck";
-var SETTING_authorizedKeys = ["monzo-87af5abcf0de4937", "juliet-ce20ef18-845e"]
-var SETTING_reducedInfoMode = true;
+//Change to true to increase logging:
+var verbose = false;
 
+//This is your pebble timline token for rws:
+var SETTING_timelineToken = "";
+
+//This is an array of access keys. E.g. SETTING_authorizedKeys = ["monzo-dw43gV9kDm"]:
+var SETTING_authorizedKeys = [];
+
+//Set to true to only include transaction amount:
+var SETTING_reducedInfoMode = false;
+
+//Translate this to change the language. All other text will be as set to the APIs
 var STRING_spent = "spent"
+
+
+//End of settings, do not change anything below this line --------------
 
 app.use(function(req, res, next) {
   req.rawBody = '';
@@ -84,11 +95,13 @@ function handleMonzoTransactionCreated(obj) {
   var data = obj.data;
 
   var pbody = obj.data.merchant.address.address + ", " + obj.data.merchant.address.city;
-  var ptitle = STRING_spent + " " + currencyToSymbol(obj.data.currency) + moneyFormat(obj.data.amount.toString().replace("-",""));
 
   if (SETTING_reducedInfoMode) {
     //We don't want to put much information in the pin
     pbody = ""
+    var ptitle = STRING_spent + " " + currencyToSymbol(obj.data.currency) + moneyFormat(obj.data.amount.toString().replace("-",""));
+  } else {
+    var ptitle = STRING_spent + " " + currencyToSymbol(obj.data.currency) + moneyFormat(obj.data.amount.toString().replace("-","")) + " @ " + obj.data.description;
   }
 
   //Hockey puck? No no, that's a coin now...
