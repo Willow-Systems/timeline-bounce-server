@@ -259,17 +259,11 @@ There are currently two types of request: `simple`, which does minimal parsing, 
 For the simple token creation, the JSON is:
 
     {
-
-    "type": "simple",
-
-    "data": {
-
-        "title": "Title of the pin",
-
-        "body": "Body of the pin"
-
-    }
-
+      "type": "simple",
+      "data": {
+          "title": "Title of the pin",
+          "body": "Body of the pin"
+      }
     }
 
   
