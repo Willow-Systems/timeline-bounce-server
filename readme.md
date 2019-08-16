@@ -76,7 +76,7 @@ Before you run the server, you will need to configure it with some keys.
 
 
 
-You need to update the server file with your pebble timeline token, used to authenticate the server to rebble web services, as well as the 'access tokens' used to authenticate incoming requests to the server.
+You need to update the server file with your pebble timeline token, used to authenticate the server to rebble web services, as well as the 'access keys' used to authenticate incoming requests to the server.
 
 
 
@@ -104,7 +104,7 @@ becomes
 
 
 
-> var SETTING_timelineToken = "<your pebble timeline token>"
+> var SETTING_timelineToken = "{your pebble timeline token}"
 
 
 
