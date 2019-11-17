@@ -1,6 +1,6 @@
 # Pebble - Timeline Bounce Server
 
-Version 1.1
+Version 1.3
 
 #### About
 
