@@ -3,7 +3,7 @@ const request = require('request');
 const uuidv4 = require('uuid/v4');
 const port = 8082;
 var app = express();
-var version = 1.2;
+var version = 1.3;
 
 //Change to true to increase logging:
 var verbose = false;
@@ -17,8 +17,11 @@ var SETTING_authorizedKeys = [];
 //Set to true to only include transaction amount:
 var SETTING_reducedInfoMode = false;
 
-//Translate this to change the language. All other text will be as set to the APIs
-var STRING_spent = "spent"
+//Translate these to change the language. All other text will be as set to the API values
+var STRING_spent = "Spent"
+var STRING_recieved = "Recieved"
+var STRING_at = "@"
+var STRING_from = "from"
 
 
 //End of settings, do not change anything below this line --------------
@@ -94,19 +97,56 @@ function handleMonzoTransactionCreated(obj) {
 
   var data = obj.data;
 
-  var pbody = obj.data.merchant.address.address + ", " + obj.data.merchant.address.city;
 
-  if (SETTING_reducedInfoMode) {
-    //We don't want to put much information in the pin
-    pbody = ""
-    var ptitle = STRING_spent + " " + currencyToSymbol(obj.data.currency) + moneyFormat(obj.data.amount.toString().replace("-",""));
+  //First of all, exclude pot related transfers
+  if (data.scheme != null && data.scheme == "uk_retail_pot") {
+
+    log("Skip transaction, is pot related", true);
+
   } else {
-    var ptitle = STRING_spent + " " + currencyToSymbol(obj.data.currency) + moneyFormat(obj.data.amount.toString().replace("-","")) + " @ " + obj.data.description;
-  }
 
-  //Hockey puck? No no, that's a coin now...
-  createTimelinePin(generateNewPinID(), SETTING_timelineToken, obj.data.created.toString(), ptitle, pbody, "HOCKEY_GAME");
-  log("Created pin", true)
+    //We need to act according to what transaction type it is
+    //Create a final data object that will be safe to use
+    var fdata = {};
+    fdata.amountString = "ERROR";
+
+    //Did we spend or recieve?
+    if (data.amount.toString().includes("-")) {
+      fdata.verb = STRING_spent;
+      fdata.titleSeperator = STRING_at;
+    } else {
+      fdata.verb = STRING_recieved;
+      fdata.titleSeperator = STRING_from;
+    }
+
+
+    //Create the first part of the title. E.g. Spent £10.00
+    fdata.amountString = currencyToSymbol(obj.data.currency) + moneyFormat(obj.data.amount.toString().replace("-",""));
+
+    if (data.local_currency != null && (data.local_currency != data.currency)) {
+      //It was a foreign currency, append the local amount E.g. Spent £10.00 (€11.00)
+      fdata.amountString = fdata.amountString + ' (' + currencyToSymbol(obj.data.local_currency) + moneyFormat(obj.data.local_amount.toString().replace("-","") + ')';
+    }
+
+    var pbody = ""
+    //Set the body as the merchant address (we will remove this if in reduced info mode)
+    if (data.merchant != null && data.merchant.address != null && data.merchant.address.short_formatted != null) {
+      pbody = data.merchant.address.short_formatted;
+    }
+
+    if (SETTING_reducedInfoMode) {
+      //We don't want to put much information in the pin
+      pbody = ""
+      var ptitle = fdata.verb + " " + fdata.amountString;
+    } else {
+      var ptitle = fdata.verb + " " + fdata.amountString + " " + fdata.titleSeperator + " " + obj.data.description;
+    }
+
+    //Hockey puck? No no, that's a coin now...
+    createTimelinePin(generateNewPinID(), SETTING_timelineToken, obj.data.created.toString(), ptitle, pbody, "HOCKEY_GAME");
+    log("Created pin", true)
+
+  }
 }
 function handleSimplePinCreation(obj) {
   var pinDate = new Date().toISOString().split('.')[0]+"Z";
