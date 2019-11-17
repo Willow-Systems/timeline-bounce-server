@@ -125,7 +125,7 @@ function handleMonzoTransactionCreated(obj) {
 
     if (data.local_currency != null && (data.local_currency != data.currency)) {
       //It was a foreign currency, append the local amount E.g. Spent £10.00 (€11.00)
-      fdata.amountString = fdata.amountString + ' (' + currencyToSymbol(obj.data.local_currency) + moneyFormat(obj.data.local_amount.toString().replace("-","") + ')';
+      fdata.amountString = fdata.amountString + ' (' + currencyToSymbol(obj.data.local_currency) + moneyFormat(obj.data.local_amount.toString().replace("-","")) + ')';
     }
 
     var pbody = ""
