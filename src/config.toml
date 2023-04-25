@@ -1,0 +1,16 @@
+title = "timeline-bounce-server"
+[rws]
+timeline_token = "" # Your RWS timeline token
+
+[util]
+verbose = true # Set to true to enable verbose logging
+authorized_keys = ["imabanana"] # List of keys allowed to use the server; e.g. monzo-dw43gV9kDm
+
+[monzo]
+reduced_info_mode = false # Only show the amount and merchant name in the timeline item
+# Localizations
+spent = "Spent" 
+recieved = "Recieved"
+at = "@"
+from = "from"
+

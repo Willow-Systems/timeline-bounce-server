@@ -1,0 +1,29 @@
+{
+  "name": "timeline-bounce-server",
+  "version": "1.0.0",
+  "description": "Version 1.3",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/willow-systems/timeline-bounce-server.git"
+  },
+  "author": "willow-systems",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/willow-systems/timeline-bounce-server/issues"
+  },
+  "homepage": "https://github.com/willow-systems/timeline-bounce-server#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "toml": "^3.0.0",
+    "uuidv4": "^6.2.13",
+    "xmlhttprequest-ssl": "^2.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  },
+  "type": "module"
+}
